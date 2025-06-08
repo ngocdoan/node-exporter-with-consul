@@ -31,56 +31,6 @@ echo -e "\e[1m\e[32mInstallation finished... \e[0m" && sleep 1
 echo -e "\e[1m\e[32mPlease make sure ports 9100 is open \e[0m" && sleep 1
 #####################################################################
 
-# Prompt the user for the Consul server address
-
-# Prompt the user for the Consul server IP address (default port 8500)
-echo "Please enter the Consul server IP address (example: 192.168.1.200):"
-read CONSUL_IP
-
-# Check if the user entered a value for the Consul server
-if [ -z "$CONSUL_IP" ]; then
-  echo "Consul server address is required. Exiting..."
-  exit 1
-fi
-
-# Prompt the user for the Consul server port (default to 8500 if empty)
-echo "Please enter the Consul server port (default: 8500):"
-read CONSUL_PORT
-
-# If the user didn't enter a port, default to 8500
-if [ -z "$CONSUL_PORT" ]; then
-  CONSUL_PORT="8500"
-fi
-
-# Combine IP and port to form the Consul server URL
-CONSUL_SERVER="http://$CONSUL_IP:$CONSUL_PORT"
-
-# Get the hostname of the machine
-HOSTNAME=$(hostname)
-
-# Get the local IP address of the machine
-IP_ADDRESS=$(hostname -I | awk '{print $1}')
-
-# Create the payload for the Consul service registration API
-curl -X PUT -d "{
-  \"ID\": \"$HOSTNAME\",
-  \"Name\": \"node-exporter\",
-  \"Tags\": [\"metrics\", \"prometheus\"],
-  \"Address\": \"$IP_ADDRESS\",
-  \"Port\": 9100,
-  \"Check\": {
-    \"HTTP\": \"http://$IP_ADDRESS:9100/metrics\",
-    \"Interval\": \"10s\"
-  }
-}" "$CONSUL_SERVER/v1/agent/service/register"
-
-# Print success message
-echo "Successfully registered node-exporter with ID: $HOSTNAME and IP address: $IP_ADDRESS to Consul at $CONSUL_SERVER"
-
-
-###############################################################
-#!/bin/bash
-
 # Default Consul port
 DEFAULT_CONSUL_PORT="8500"
 
