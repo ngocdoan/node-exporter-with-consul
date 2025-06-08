@@ -4,6 +4,11 @@
 echo "Please enter the Consul server IP address (default: 192.168.135.249):"
 read CONSUL_IP
 
+# Check if the user entered a value for the Consul server
+if [ -z "$CONSUL_IP" ]; then
+  echo "Consul server address is required. Exiting..."
+  exit 1
+fi
 
 # Prompt the user for the Consul server port (default to 8500 if empty)
 echo "Please enter the Consul server port (default: 8500):"
