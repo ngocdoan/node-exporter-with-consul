@@ -67,10 +67,6 @@ if [ -z "$CONSUL_IP" ]; then
   fi
 fi
 
-# Prompt the user for the Consul server port (default to 8500 if empty)
-echo "Please enter the Consul server port (default: 8500):"
-read CONSUL_PORT
-
 # If no consul-port is provided via argument, default to 8500
 if [ -z "$CONSUL_PORT" ]; then
   CONSUL_PORT=$DEFAULT_CONSUL_PORT
