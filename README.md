@@ -1,7 +1,8 @@
 # node-exporter-with-consul
 
 ## Change hostname first
-```read -p "Enter new hostname: " NEW_HOSTNAME && sudo hostnamectl set-hostname "$NEW_HOSTNAME" && echo "Hostname changed to $NEW_HOSTNAME" && echo "Current hostname is: $(hostname)"
+```
+read -p "Enter new hostname: " NEW_HOSTNAME && sudo hostnamectl set-hostname "$NEW_HOSTNAME" && echo "Hostname changed to $NEW_HOSTNAME" && echo "Current hostname is: $(hostname)"
 ```
 ## Install node exporter and register with consul
 ```
