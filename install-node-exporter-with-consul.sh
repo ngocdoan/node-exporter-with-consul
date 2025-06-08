@@ -76,3 +76,82 @@ curl -X PUT -d "{
 
 # Print success message
 echo "Successfully registered node-exporter with ID: $HOSTNAME and IP address: $IP_ADDRESS to Consul at $CONSUL_SERVER"
+
+
+###############################################################
+#!/bin/bash
+
+# Default Consul port
+DEFAULT_CONSUL_PORT="8500"
+
+# Function to show usage
+usage() {
+  echo "Usage: $0 [--consul-ip <ip-address>] [--consul-port <port>]"
+  exit 1
+}
+
+# Parse command line arguments
+while [[ "$1" =~ ^-- ]]; do
+  case "$1" in
+    --consul-ip)
+      CONSUL_IP="$2"
+      shift 2
+      ;;
+    --consul-port)
+      CONSUL_PORT="$2"
+      shift 2
+      ;;
+    *)
+      usage
+      ;;
+  esac
+done
+
+# If no consul-ip is provided via argument, ask the user for it
+if [ -z "$CONSUL_IP" ]; then
+  echo "Please enter the Consul server IP address (required):"
+  read CONSUL_IP
+  if [ -z "$CONSUL_IP" ]; then
+    echo "Consul server IP address is required. Exiting..."
+    exit 1
+  fi
+fi
+
+# Prompt the user for the Consul server port (default to 8500 if empty)
+echo "Please enter the Consul server port (default: 8500):"
+read CONSUL_PORT
+
+# If no consul-port is provided via argument, default to 8500
+if [ -z "$CONSUL_PORT" ]; then
+  CONSUL_PORT=$DEFAULT_CONSUL_PORT
+fi
+
+# Combine IP and port to form the Consul server URL
+CONSUL_SERVER="http://$CONSUL_IP:$CONSUL_PORT"
+
+# Get the hostname of the machine
+HOSTNAME=$(hostname)
+
+# Get the local IP address of the machine
+IP_ADDRESS=$(hostname -I | awk '{print $1}')
+
+# Send the request to register the service to Consul
+response=$(curl -s -o /dev/null -w "%{http_code}" -X PUT -d "{
+  \"ID\": \"$HOSTNAME\",
+  \"Name\": \"node-exporter\",
+  \"Tags\": [\"metrics\", \"prometheus\"],
+  \"Address\": \"$IP_ADDRESS\",
+  \"Port\": 9100,
+  \"Check\": {
+    \"HTTP\": \"http://$IP_ADDRESS:9100/metrics\",
+    \"Interval\": \"10s\"
+  }
+}" "$CONSUL_SERVER/v1/agent/service/register")
+
+# Check if the request was successful
+if [ "$response" -eq 200 ]; then
+  echo "Successfully registered node-exporter with ID: $HOSTNAME and IP address: $IP_ADDRESS to Consul at $CONSUL_SERVER"
+else
+  echo "Failed to register node-exporter with ID: $HOSTNAME to Consul. Error code: $response"
+fi
+
