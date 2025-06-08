@@ -1,22 +1,44 @@
 #!/bin/bash
 
-# Prompt the user for the Consul IP address
-echo "Please enter the Consul server IP address (default: 192.168.135.249):"
-read CONSUL_IP
+# Default Consul port
+DEFAULT_CONSUL_PORT="8500"
 
-# Check if the user entered a value for the Consul server
-if [ -z "$CONSUL_IP" ]; then
-  echo "Consul server address is required. Exiting..."
+# Function to show usage
+usage() {
+  echo "Usage: $0 [--consul-ip <ip-address>] [--consul-port <port>]"
   exit 1
+}
+
+# Parse command line arguments
+while [[ "$1" =~ ^-- ]]; do
+  case "$1" in
+    --consul-ip)
+      CONSUL_IP="$2"
+      shift 2
+      ;;
+    --consul-port)
+      CONSUL_PORT="$2"
+      shift 2
+      ;;
+    *)
+      usage
+      ;;
+  esac
+done
+
+# If no consul-ip is provided via argument, ask the user for it
+if [ -z "$CONSUL_IP" ]; then
+  echo "Please enter the Consul server IP address (required):"
+  read CONSUL_IP
+  if [ -z "$CONSUL_IP" ]; then
+    echo "Consul server IP address is required. Exiting..."
+    exit 1
+  fi
 fi
 
-# Prompt the user for the Consul server port (default to 8500 if empty)
-echo "Please enter the Consul server port (default: 8500):"
-read CONSUL_PORT
-
-# If the user didn't enter a port, default to 8500
+# If no consul-port is provided via argument, default to 8500
 if [ -z "$CONSUL_PORT" ]; then
-  CONSUL_PORT="8500"
+  CONSUL_PORT=$DEFAULT_CONSUL_PORT
 fi
 
 # Combine IP and port to form the Consul server URL
