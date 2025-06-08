@@ -9,5 +9,5 @@ wget -O install-node-exporter-with-consul.sh https://raw.githubusercontent.com/n
 ```
 ## Deregister with consul
 ```
-
+wget -O deregister-with-consul.sh https://raw.githubusercontent.com/ngocdoan/node-exporter-with-consul/refs/heads/main/deregister-with-consul.sh && chmod +x deregister-with-consul.sh && ./deregister-with-consul.sh
 ```
