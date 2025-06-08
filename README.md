@@ -1,4 +1,24 @@
 # node-exporter-with-consul
+## Update `prometheus.yml`
+```
+  - job_name: node
+    metrics_path: /metrics
+    consul_sd_configs:
+      - server: '<Consul-IP-Address:Port>'
+        services: ['node-exporter']
+    relabel_configs:
+      - source_labels: [__meta_consul_service_id]
+        target_label: instance
+        action: replace
+
+      - source_labels: [__meta_consul_service_id]
+        target_label: node
+        action: replace
+
+      - source_labels: [__meta_consul_tags]
+        target_label: tags
+        action: replace
+```
 
 ## Change hostname first
 ```
